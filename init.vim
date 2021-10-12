@@ -1,5 +1,6 @@
 let mapleader=" "
 
+let g:tag_highlight#run_ctags=1
 call plug#begin('~/.vim/plugged')
 
 " This causes serious performace problems with large tags file
@@ -35,6 +36,13 @@ Plug 'xolox/vim-easytags'
 "Plug 'neovim/nvim-lsp'
 
 call plug#end()
+
+set nocompatible
+set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim " path to dein.vim
+call dein#begin(expand("~/.vim/dein"))
+call dein#add('roflcopter4/tag-highlight.nvim', {'merged': v:false, 'build': 'sh build.sh'})
+"call dein#add('c0r73x/neotags.nvim', {'build': 'make'})
+call dein#end()
 
 syntax on
 filetype plugin on
@@ -240,9 +248,7 @@ function RunProgram(path_arg)
 endfunction
 
 
-
 function SetExe(file)
     let command = 'nnoremap <f4> :call RunProgram("bin/' . a:file . '")<cr>'
     execute command
 endfunction
-
