@@ -1,48 +1,46 @@
 let mapleader=" "
 
-let g:tag_highlight#run_ctags=1
 call plug#begin('~/.vim/plugged')
 
 " This causes serious performace problems with large tags file
 "Plug 'KeitaNakamura/highlighter.nvim', { 'do': ':UpdateRemotePlugins' }
-"Plug 'nvim-treesitter/nvim-treesitter'
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
 
 Plug 'sainnhe/gruvbox-material'
 Plug 'dracula/vim', { 'as': 'dracula' }
 
 Plug 'jiangmiao/auto-pairs'
 
-Plug 'kien/ctrlp.vim'
-"Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-"Plug 'junegunn/fzf.vim'
+Plug 'nvim-lua/plenary.nvim'
+Plug 'nvim-telescope/telescope.nvim'
+Plug 'nvim-telescope/telescope-fzf-native.nvim', { 'do': 'make' }
+"Plug 'kien/ctrlp.vim'
+"Plug 'JazzCore/ctrlp-cmatcher'
 
-Plug 'cpiger/NeoDebug'
+"Plug 'cpiger/NeoDebug'
 
 Plug 'vim-airline/vim-airline'
 Plug 'enricobacis/vim-airline-clock'
 Plug 'tikhomirov/vim-glsl'
 
-Plug 'rust-lang/rust.vim'
+Plug 'skywind3000/asyncrun.vim'
+Plug 'ludovicchabant/vim-gutentags'
+Plug 'skywind3000/gutentags_plus'
+"Plug 'vim-scripts/gtags.vim'
 
-Plug 'vim-scripts/vim-misc'
-Plug 'xolox/vim-easytags'
-"Plug 'neoclide/coc.nvim', {'branch': 'release'}
-"Plug 'jackguo380/vim-lsp-cxx-highlight'
-
-"Plug 'autozimu/LanguageClient-neovim', {
-"    \ 'branch': 'next',
-"    \ 'do': 'bash install.sh',
-"    \ }
 "Plug 'neovim/nvim-lsp'
+
+Plug 'vim-syntastic/syntastic'
+"Plug 'nvie/vim-flake8'
 
 call plug#end()
 
-set nocompatible
-set runtimepath+=~/.vim/dein/repos/github.com/Shougo/dein.vim " path to dein.vim
-call dein#begin(expand("~/.vim/dein"))
-call dein#add('roflcopter4/tag-highlight.nvim', {'merged': v:false, 'build': 'sh build.sh'})
-"call dein#add('c0r73x/neotags.nvim', {'build': 'make'})
-call dein#end()
+let python_highlight_all=1
+
+"let g:ctrlp_match_func = {'match' : 'matcher#cmatch' }
+let g:ctrlp_max_files = 0
+
+set statusline+=%{gutentags#statusline('[',']')}
 
 syntax on
 filetype plugin on
@@ -67,15 +65,20 @@ set splitbelow
 set splitright
 
 set clipboard+=unnamedplus
+
+set guifont=Consolas:h9
  
 nnoremap <leader>v :vs<CR>
 nnoremap <leader>s :sp<CR>
 nnoremap <leader>a za
 
-nnoremap <leader>e :CtrlP<cr>
-nnoremap <leader>r :CtrlPBuffer<cr>
-nnoremap <leader>t :CtrlPTag<cr>
-nnoremap <leader>y :CtrlPLine<cr>
+"let g:ctrlp_map='<leader>e'
+"nnoremap <leader>r :CtrlPBuffer<Enter>
+"nnoremap <leader>t :CtrlPTag<Enter>
+
+nnoremap <leader>e :Telescope git_files theme=ivy<Enter>
+nnoremap <leader>r :Telescope buffers theme=ivy<Enter>
+nnoremap <leader>t :Telescope tags theme=ivy only_sort_tags=true<Enter>
 
 nnoremap <leader><Enter> <C-^>
 
@@ -92,23 +95,16 @@ nnoremap <leader>q <C-w>c
 nnoremap <leader>x :cn<cr>
 nnoremap <leader><Esc> :noh<cr>
 
-nnoremap <F36> :e ~/.config/nvim/init.vim<cr>
-
 tnoremap <C-Esc> <C-\><C-n>
 
-au BufRead,BufNewFile *.ogge set filetype=ogge
+nnoremap <C-F12> :e ~\AppData\Local\nvim\init.vim<cr>
 
 command! W w
 
-set termguicolors
 colo gruvbox-material
 let g:airline_theme='gruvbox_material'
 "colo dracula
 "let g:airline_theme='dracula'
-"colo PaperColor
-"let g:airline_theme='papercolor'
-let g:monokai_term_italic = 1
-let g:monokai_gui_italic = 1
 
 let g:netrw_banner=0
 let g:netrw_winsize=10
@@ -117,15 +113,12 @@ let g:netrw_liststyle=3
 let g:highlighter#project_root_signs = ['.git']
 let g:highlighter#auto_update = 2
 
-let g:easytags_async=1
+let g:gutentags_modules = ['ctags', 'gtags_cscope'] " enable gtags module
+let g:gutentags_project_root = ['.root'] " config project root markers.
+let g:gutentags_cache_dir = expand('~/.cache/tags') " generate datebases in my cache directory, prevent gtags files polluting my project
+let g:gutentags_plus_switch = 1 " change focus to quickfix window after search (optional).
+let g:gutentags_define_advanced_commands = 1
 
-autocmd FileType C let b:easytags_auto_highlight = 1
-autocmd FileType C++ let b:easytags_auto_highlight = 1
-
-
-" 
-" Read project settings file
-"
 function ReadProjSettings()
     if filereadable(".proj.vim")
         so .proj.vim
@@ -134,10 +127,16 @@ endfunction
 
 autocmd VimEnter * call ReadProjSettings()
 
+fun! Runcmd(cmd)
+    silent! exe "noautocmd botright pedit ".a:cmd
+    noautocmd wincmd P
+    set buftype=nofile
+    exe "noautocmd r! ".a:cmd
+    noautocmd wincmd p
+endfun
+com! -nargs=1 Runcmd :call Runcmd("<args>")
 
-"
-" Tab complete
-"
+
 function! Smart_TabComplete()
   let line = getline('.')                         " current line
 
@@ -158,15 +157,19 @@ function! Smart_TabComplete()
     return "\<C-X>\<C-O>"                         " plugin matching
   endif
 endfunction
-
 inoremap <tab> <c-r>=Smart_TabComplete()<CR>
 
-"
-" Insert gates and include statement when createing c and c++ files
-"
+":lua << EOF
+"require'nvim_lsp'.rust_analyzer.setup{}
+"EOF
+
+"require'nvim_lsp'.clangd.setup{}
+
+"set omnifunc=lsp#omnifunc
+
 function! s:insert_gates()
   let gatename = substitute(toupper(expand("%:t")), "\\\.", "_", "g")
-  echo gatename
+  "echo gatename
   execute "normal! i#ifndef " . gatename
   execute "normal! o#define " . gatename . " "
   execute "normal! Go#endif /* " . gatename . " */"
@@ -175,12 +178,7 @@ endfunction
 autocmd BufNewFile *.{h,hpp} call <SID>insert_gates()
 
 function! s:insert_include()
-  if filereadable(expand("%:r") . ".h")
-      let gatename = expand("%:t:r") . ".h"
-  elseif filereadable(expand("%:r") . ".hpp")
-      let gatename = expand("%:t:r") . ".hpp"
-  endif
-
+  let gatename = expand("%:t:r") . ".h"
   if(filereadable(expand("%:h") . "/" . gatename))
       execute "normal! i#include \"" . gatename . "\""
       normal! kk
@@ -188,46 +186,15 @@ function! s:insert_include()
 endfunction
 autocmd BufNewFile *.{c,cpp,cc} call <SID>insert_include()
 
-
-"
-" Toggle header in c and c++
-"
-let g:default_header_ext=".h"
-let g:default_source_ext=".c"
-function ToggleHeader()
-    let type = expand("%:e")
-    if type=="h" || type=="hpp"
-        if filereadable(expand("%:r") . ".cc")
-            :e %:r.cc
-        elseif filereadable(expand("%:r") . ".c")
-            :e %:r.c
-        elseif filereadable(expand("%:r") . ".cpp")
-            :e %:r.cpp
-        else
-            execute "e " . expand("%:r") . g:default_source_ext
-        endif
-    elseif type=="cc" || type=="cpp"
-        if filereadable(expand("%:r") . ".hpp")
-            :e %:r.hpp
-        elseif filereadable(expand("%:r") . ".h")
-            :e %:r.h
-        else
-            execute "e " . expand("%:r") . g:default_header_ext
-        endif
-    elseif type=="c"
-        :e %:r.h
-    endif
-endfunction
-nnoremap <leader>m :call ToggleHeader()<cr>
-
-
-"
-" Run a program in nvim's terminal
-"
+let g:run_program_split_vertical=0
 let g:buffnr = -1
 function RunProgram(path_arg)
     if(g:buffnr < 0 || !bufexists(g:buffnr))
-        execute '10sp'
+        if(g:run_program_split_vertical==0)
+            execute '10sp'
+        else
+            execute '100vs'
+        endif
         execute 'terminal ' . a:path_arg
         let g:buffnr = bufnr('%')
     else
@@ -247,8 +214,146 @@ function RunProgram(path_arg)
     execute "normal! a"
 endfunction
 
-
-function SetExe(file)
-    let command = 'nnoremap <f4> :call RunProgram("bin/' . a:file . '")<cr>'
-    execute command
+function ToggleHeader()
+    let type = expand("%:e")
+    if type=="h"
+        if filereadable(expand("%:r") . ".cc")
+            :e %:r.cc
+        elseif filereadable(expand("%:r") . ".cpp")
+            :e %:r.cpp
+        else
+            :e %:r.c
+        endif
+    elseif type=="cc"
+        :e %:r.h
+    elseif type=="cpp"
+        :e %:r.h
+    elseif type=="c"
+        :e %:r.h
+    endif
 endfunction
+
+nnoremap <leader>m :call ToggleHeader()<cr>
+
+lua << EOF
+
+local actions = require "telescope.actions"
+require('telescope').setup{
+  defaults = {
+    -- Default configuration for telescope goes here:
+    -- config_key = value,
+    mappings = {
+       i = {
+          ["<C-j>"] = actions.move_selection_next,
+          ["<C-k>"] = actions.move_selection_previous,
+
+          ["<C-c>"] = actions.close,
+
+          ["<Down>"] = actions.move_selection_next,
+          ["<Up>"] = actions.move_selection_previous,
+
+          ["<CR>"] = actions.select_default,
+          ["<C-x>"] = actions.select_horizontal,
+          ["<C-v>"] = actions.select_vertical,
+          ["<C-t>"] = actions.select_tab,
+
+          ["<C-u>"] = actions.preview_scrolling_up,
+          ["<C-d>"] = actions.preview_scrolling_down,
+
+          ["<PageUp>"] = actions.results_scrolling_up,
+          ["<PageDown>"] = actions.results_scrolling_down,
+
+          ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
+          ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+          ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
+          ["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+          ["<C-l>"] = actions.complete_tag,
+          ["<C-_>"] = actions.which_key, -- keys from pressing <C-/>
+          ["<C-w>"] = { "<c-s-w>", type = "command" },
+          ["<esc>"] = actions.close,
+        },
+--
+--        n = {
+--          ["<esc>"] = actions.close,
+--          ["<CR>"] = actions.select_default,
+--          ["<C-x>"] = actions.select_horizontal,
+--          ["<C-v>"] = actions.select_vertical,
+--          ["<C-t>"] = actions.select_tab,
+--
+--          ["<Tab>"] = actions.toggle_selection + actions.move_selection_worse,
+--          ["<S-Tab>"] = actions.toggle_selection + actions.move_selection_better,
+--          ["<C-q>"] = actions.send_to_qflist + actions.open_qflist,
+--          ["<M-q>"] = actions.send_selected_to_qflist + actions.open_qflist,
+--
+--          -- TODO: This would be weird if we switch the ordering.
+--          ["j"] = actions.move_selection_next,
+--          ["k"] = actions.move_selection_previous,
+--          ["H"] = actions.move_to_top,
+--          ["M"] = actions.move_to_middle,
+--          ["L"] = actions.move_to_bottom,
+--
+--          ["<Down>"] = actions.move_selection_next,
+--          ["<Up>"] = actions.move_selection_previous,
+--          ["gg"] = actions.move_to_top,
+--          ["G"] = actions.move_to_bottom,
+--
+--          ["<C-u>"] = actions.preview_scrolling_up,
+--          ["<C-d>"] = actions.preview_scrolling_down,
+--
+--          ["<PageUp>"] = actions.results_scrolling_up,
+--          ["<PageDown>"] = actions.results_scrolling_down,
+--
+--          ["?"] = actions.which_key,
+--        }, 
+    }
+  },
+  pickers = {
+    -- Default configuration for builtin pickers goes here:
+    -- picker_name = {
+    --   picker_config_key = value,
+    --   ...
+    -- }
+    -- Now the picker_config_key will be applied every time you call this
+    -- builtin picker
+  },
+  extensions = {
+    -- Your extension configuration goes here:
+    -- extension_name = {
+    --   extension_config_key = value,
+    -- }
+    -- please take a look at the readme of the extension you want to configure
+  }
+}
+
+require('telescope').load_extension('fzf')
+
+
+require'nvim-treesitter.configs'.setup {
+  -- A list of parser names, or "all"
+  ensure_installed = { "c", "cpp" },
+
+  -- Install parsers synchronously (only applied to `ensure_installed`)
+  sync_install = false,
+
+  -- List of parsers to ignore installing (for "all")
+  --ignore_install = { "javascript" },
+
+  highlight = {
+    -- `false` will disable the whole extension
+    enable = true,
+
+    -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
+    -- disable highlighting for the `tex` filetype, you need to include `latex` in this list as this is
+    -- the name of the parser)
+    -- list of language that will be disabled
+    --disable = { "c", "rust" },
+
+    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
+    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
+    -- Using this option may slow down your editor, and you may see some duplicate highlights.
+    -- Instead of true it can also be a list of languages
+    additional_vim_regex_highlighting = false,
+  },
+}
+
+EOF
