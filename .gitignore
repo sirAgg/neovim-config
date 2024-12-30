@@ -1,5 +1,2 @@
-*
-!*/
-!init.vim
-!.gitignore
-!/default_project_configs/*.proj.vim
+lua/plugins/*
+lazy-lock.json
