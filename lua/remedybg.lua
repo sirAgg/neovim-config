@@ -1,43 +1,41 @@
-print'hello remedy'
 local M = {}
 
 local function is_remedy_running()
     local output = vim.fn.system('tasklist', '')
 
     if output:find('remedybg.exe', 1, true) then
-	return true
+		return true
     end
 
     return false
 end
 
 local function find_remedy_project_file()
-    local handle = io.popen('dir /b', 'r')
+    local handle = io.popen('dir /b *.rdbg', 'r')
 
     if handle then
-	local res = '\n' .. handle:read('*a')
-	local s, e = string.find(res, '\n.+%.rdbg')
-	if s and e then return string.sub(res, s, e) end
+		local res = '\n' .. handle:read('*a')
+		local s, e = string.find(res, '%s.+%.rdbg')
+		if s and e then return string.sub(res, s, e) end
     end
 end
-
 
 local function start_remedy()
     local remedy_proj = find_remedy_project_file()
     if remedy_proj then
-	vim.system({'remedybg.exe', remedy_proj}, {text = true})
+		vim.system({'remedybg.exe', remedy_proj}, {text=true});
     end
 end
 
 local function start_debugging()
     if is_remedy_running() then
     	vim.fn.system('remedybg.exe start-debugging')
-	return
+		return
     end
 
     local remedy_proj = find_remedy_project_file()
     if remedy_proj then
-	vim.system({'remedybg.exe', '-g', remedy_proj}, {text = true})
+		vim.system({'remedybg.exe', '-g', remedy_proj}, {text=true});
     end
 end
 
@@ -61,8 +59,9 @@ end
 M.setup = function (_)
     vim.api.nvim_create_user_command('RemedyStartDebugging', function(_) start_debugging() end, {} )
     vim.api.nvim_create_user_command('RemedyStopDebugging', function(_) stop_debugging() end, {} )
+	vim.api.nvim_create_user_command('RemedySetBreakpointAtCursor', function(_) M.set_breakpoint_at_cursor() end, {} )
+	vim.api.nvim_create_user_command('RemedyFile', function(_) print(find_remedy_project_file()) end, {} )
 end
-vim.api.nvim_create_user_command('RemedySetBreakpointAtCursor', function(_) M.set_breakpoint_at_cursor() end, {} )
 
 M.start_debugging = start_debugging
 M.stop_debugging = stop_debugging

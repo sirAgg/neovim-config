@@ -37,10 +37,10 @@ endfunction
 
 nnoremap <silent><F11> :call ToggleFullscreen()<cr>
 
-let s:fontsize = 18
+let s:fontsize = 10
 function! AdjustFontSize(amount)
   let s:fontsize = s:fontsize+a:amount
-  :execute "GuiFont UbuntuMono Nerd Font Mono:h" . s:fontsize
+  :execute "GuiFont JetBrainsMono NFM:h" . s:fontsize
 endfunction
  
 noremap <C-ScrollWheelUp> :call AdjustFontSize(1)<CR>

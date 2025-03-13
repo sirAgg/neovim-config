@@ -13,12 +13,19 @@ return {
 	      },
 	    },
 	  },
+      {'cmp-nvim-lsp'},
 	},
 	config = function()
-	    local capabilities = require('blink.cmp').get_lsp_capabilities()
+	    local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 	    require'lspconfig'.lua_ls.setup{ capabilities = capabilities }
 	    require'lspconfig'.clangd.setup{ capabilities = capabilities }
+        require'lspconfig'.luau_lsp.setup{
+            capabilities = capabilities,
+            cmd = {"luau-lsp", "lsp", "--definitions=C:\\Users\\Magnus\\Downloads\\globalTypes.d.luau"}
+        }
+        require'lspconfig'.jsonls.setup{ capabilities = capabilities }
+        require'lspconfig'.selene3p_ls.setup{ filetypes = {'lua', 'luau'}, capabilities = capabilities }
 	end
     }
 }

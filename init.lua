@@ -4,6 +4,7 @@ vim.g.maplocalleader = "\\"
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.shiftwidth = 4
 vim.opt.tabstop = 4
+vim.opt.expandtab = true
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
@@ -20,9 +21,17 @@ vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 vim.opt.foldtext = ''
 vim.opt.foldlevelstart = 99
 
+vim.cmd('set path+=**')
+vim.cmd('set nocompatible')
+vim.cmd('set wildmode=longest,list,full')
+vim.cmd('set wildmenu')
+
+
 require'config.lazy'
 require'project_build'
 require'function_name'
+local rojo = require'rojo_runner'
+rojo.setup{}
 
 local rem = require'remedybg'
 
@@ -33,6 +42,7 @@ vim.keymap.set("n", '<space>x', ':.lua<cr>')
 vim.keymap.set("v", '<space>x', ':lua<cr>')
 
 vim.keymap.set("n", '<space>b', rem.start_debugging)
+vim.keymap.set("n", '<space>f', rem.set_breakpoint_at_cursor)
 vim.keymap.set("n", '<space><esc>', '<cmd>noh<cr>')
 vim.keymap.set("n", '<space><enter>', '<C-^>')
 
@@ -44,13 +54,13 @@ vim.keymap.set('n', '<leader>H', '<C-W>H', { desc = 'Move window left' })
 vim.keymap.set('n', '<leader>J', '<C-W>J', { desc = 'Move window down' })
 vim.keymap.set('n', '<leader>K', '<C-W>K', { desc = 'Move window up' })
 vim.keymap.set('n', '<leader>L', '<C-W>L', { desc = 'Move window right' })
-vim.keymap.set('n', '<leader>q', '<C-W>c', { desc = 'Focus window right' })
-vim.keymap.set('n', '<leader>p', '<C-W>p', { desc = 'Focus window right' })
-vim.keymap.set('n', '<leader>s', '<C-W>s', { desc = 'Focus window right' })
-vim.keymap.set('n', '<leader>v', '<C-W>v', { desc = 'Focus window right' })
+vim.keymap.set('n', '<leader>q', '<C-W>c', { desc = 'Close window' })
+vim.keymap.set('n', '<leader>v', '<C-W>v', { desc = 'Split vertical' })
+vim.keymap.set('n', '<leader>V', '<C-W>s', { desc = 'Split horizontal' })
 
-vim.keymap.set('n', '<leader>d', '<C-]>')
-vim.keymap.set('n', '<leader>D', '<C-t>')
+
+vim.keymap.set('n', 'gd', '<C-]>')
+vim.keymap.set('n', 'gD', '<C-t>')
 vim.keymap.set('n', '<leader>z', '<cmd>lua vim.diagnostic.setqflist()<cr>')
 
 vim.keymap.set('n', 'gn', '<cmd>cnext<cr>')
@@ -61,6 +71,12 @@ vim.keymap.set('t', '<esc>', '<C-\\><C-n>')
 if vim.fn.has('win32') or vim.fn.has('win64') then
     vim.keymap.set('n', '<F9>', '<cmd>!explorer .<cr><cr>')
 end
+
+vim.keymap.set('n', 'grn', vim.lsp.buf.rename)
+vim.keymap.set('n', 'gra', vim.lsp.buf.code_action)
+vim.keymap.set('n', 'grr', vim.lsp.buf.references)
+vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help)
+vim.keymap.set('n', '<leader>m', '<cmd>ClangdSwitchSourceHeader<cr>')
 
 require('telescope').load_extension('projects')
 local telescope_builtin = require('telescope.builtin')
@@ -82,6 +98,19 @@ vim.keymap.set('n', '<leader>r', telescope_builtin.buffers, { desc = 'Telescope 
 vim.keymap.set('n', '<leader>t', telescope_builtin.lsp_dynamic_workspace_symbols, { desc = 'Lsp symbols' })
 vim.keymap.set('n', '<leader>p', require'telescope'.extensions.projects.projects, { desc = 'Projects' })
 
+vim.keymap.set('n', '<leader>g', function() require'neogit'.open({kind = 'floating'}) end, { desc = 'Git' })
+
+vim.keymap.set('n', '<leader>o', function() require'oil'.toggle_float() end, { desc = 'Oil' })
+
+local harpoon = require'harpoon'
+vim.keymap.set('n', '<leader>w', function() harpoon:list():add() end, {desc = 'Harpoon add'})
+vim.keymap.set('n', '<leader>a', function() harpoon:list():select(1) end, {desc = 'Harpoon goto 1'})
+vim.keymap.set('n', '<leader>s', function() harpoon:list():select(2) end, {desc = 'Harpoon goto 2'})
+vim.keymap.set('n', '<leader>d', function() harpoon:list():select(3) end, {desc = 'Harpoon goto 3'})
+vim.keymap.set('n', '<leader>f', function() harpoon:list():select(4) end, {desc = 'Harpoon goto 4'})
+
+vim.keymap.set("n", "<C-h>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+
 vim.api.nvim_create_autocmd('TextYankPost', {
 	desc = 'Highlight when yanking text',
 	group = vim.api.nvim_create_augroup('kickstart-highlight-group', {clear = true} ),
@@ -90,3 +119,6 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 	end,
     }
 )
+
+vim.o.updatetime = 250
+vim.cmd [[autocmd CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
