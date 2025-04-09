@@ -1,6 +1,8 @@
 " Enable Mouse
 set mouse=a
 
+if exists("g:neovide")
+else
 " Disable GUI Tabline
 if exists(':GuiTabline')
     GuiTabline 0
@@ -57,3 +59,4 @@ inoremap <C-kPlus> <Esc>:call AdjustFontSize(1)<CR>a
 inoremap <C-kMinus> <Esc>:call AdjustFontSize(-1)<CR>a
  
 call AdjustFontSize(0)
+endif
