@@ -93,9 +93,10 @@ vim.api.nvim_create_autocmd({'VimEnter', 'DirChanged'}, {
     end
 })
 
-vim.keymap.set('n', '<leader>y', telescope_builtin.live_grep, { desc = 'Telescope live grep' })
 vim.keymap.set('n', '<leader>r', telescope_builtin.buffers, { desc = 'Telescope buffers' })
 vim.keymap.set('n', '<leader>t', telescope_builtin.lsp_dynamic_workspace_symbols, { desc = 'Lsp symbols' })
+vim.keymap.set('n', '<leader>y', telescope_builtin.live_grep, { desc = 'Telescope live grep' })
+vim.keymap.set('n', '<leader>u', '<cmd>TodoTelescope<cr>', { desc = 'Telescope Todo' })
 vim.keymap.set('n', '<leader>p', require'telescope'.extensions.projects.projects, { desc = 'Projects' })
 
 vim.keymap.set('n', '<leader>g', function() require'neogit'.open({kind = 'floating'}) end, { desc = 'Git' })
@@ -119,6 +120,53 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 	end,
     }
 )
+
+function RunSelene()
+    if vim.fn.filereadable('selene.toml') == 1 then
+        vim.schedule(function()
+            local lines = vim.fn.systemlist('selene . -q')
+            local list = {}
+
+            local msgs = 0
+
+            for _, line in ipairs(lines) do
+                local file_end = line:find(':')
+                if not file_end then
+                    table.insert(list, {text = line, valid = false})
+                    goto continue
+                end
+                local file = line:sub(0, file_end-1) -- -1 to skip colon
+
+                local line_num, col_num = string.match(line,':(%d*):(%d*):', file_end)
+
+                --local _, num_end = string.find(line,':(%d*):(%d*):', file_end)
+
+                local type = 'W'
+                if line:find('warning%[.*%]', file_end) then
+                    type = 'W'
+                elseif line:find('error%[.*%]', file_end) then
+                    type = 'E'
+                else
+                    table.insert(list, {text = line, valid = false})
+                    goto continue
+                end
+
+                local text = line:match('.*(%[.*)$', file_end)
+
+                table.insert(list, {filename = file, lnum = line_num, col = col_num, type = type, text = text})
+                msgs = msgs+1
+                ::continue::
+            end
+            if msgs <= 0 then
+                print("no selene errors")
+            end
+            vim.fn.setqflist(list)
+            vim.cmd('cw')
+        end)
+    end
+end
+
+vim.keymap.set('n', '<leader>Z', RunSelene)
 
 vim.o.updatetime = 250
 vim.cmd [[autocmd CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]

@@ -53,6 +53,7 @@ local function rojo_serve(project_file)
     rojo_log_write("[Staring rojo serve " .. project_file .. "]");
 
     local on_output = vim.schedule_wrap(function(_, data)
+        if not data then return end
 
         local success, msg = pcall(parse_rojo_error, data)
 
@@ -88,7 +89,7 @@ local function rojo_sourcemap(project_file)
     local command = {"rojo", "sourcemap", "--watch", project_file, "--output", "sourcemap.json", "--include-non-scripts"}
     rojo_sourcemap_process = vim.system(command, {text = true}, function(_)
         rojo_sourcemap_process = nil
-        rojo_log_write("[Rojo sourcemap stopped]");
+        vim.schedule(function() rojo_log_write("[Rojo sourcemap stopped]") end);
     end)
 end
 
@@ -138,7 +139,9 @@ local function find_all_project_files_in_dir(project_files, dir, recursion)
         if v:sub(-#file_ext) == file_ext then
              table.insert(project_files, v)
         elseif vim.fn.isdirectory(tostring(v)) > 0 then
-            find_all_project_files_in_dir(project_files, v, recursion+1)
+            if v ~= '.' and v ~= '..' then
+                find_all_project_files_in_dir(project_files, v, recursion+1)
+            end
         end
     end
 end

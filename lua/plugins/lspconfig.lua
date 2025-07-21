@@ -22,7 +22,7 @@ return {
 	    require'lspconfig'.clangd.setup{ capabilities = capabilities }
         require'lspconfig'.luau_lsp.setup{
             capabilities = capabilities,
-            cmd = {"luau-lsp", "lsp", "--definitions=C:\\Users\\Magnus\\Downloads\\globalTypes.d.luau"}
+            cmd = {"luau-lsp", "lsp", "--definitions=C:\\Users\\Magnus\\Downloads\\globalTypes.d.luau"},
         }
         require'lspconfig'.jsonls.setup{ capabilities = capabilities }
         require'lspconfig'.selene3p_ls.setup{ filetypes = {'lua', 'luau'}, capabilities = capabilities }
