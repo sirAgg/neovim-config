@@ -170,6 +170,7 @@ vim.keymap.set('n', '<leader>Z', RunSelene)
 
 vim.o.updatetime = 250
 vim.cmd [[autocmd CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+vim.cmd [[autocmd CursorHold * lua vim.diagnostic.open_float(nil, {focus=false})]]
 
 if vim.g.neovide then
     vim.o.guifont = "JetBrainsMono NFM:h14"
