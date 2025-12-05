@@ -22,10 +22,18 @@ return {
 	    require'lspconfig'.clangd.setup{ capabilities = capabilities }
         require'lspconfig'.luau_lsp.setup{
             capabilities = capabilities,
-            cmd = {"luau-lsp", "lsp", "--definitions=C:\\Users\\Magnus\\Downloads\\globalTypes.d.luau"},
+            cmd = {"luau-lsp", "lsp", "--definitions=C:\\Users\\Magnus\\Downloads\\globalTypes.d.luau"}, --, "--flag:LuauSolverV2=true"
         }
         require'lspconfig'.jsonls.setup{ capabilities = capabilities }
         require'lspconfig'.selene3p_ls.setup{ filetypes = {'lua', 'luau'}, capabilities = capabilities }
+
+        vim.lsp.config('ltex-plus', {
+            cmd = {'ltex-ls-plus'},
+            ltex = {
+                language = 'sv'
+            },
+            enabled = { "bib", "context", "gitcommit", "html", "markdown", "org", "pandoc", "plaintex", "quarto", "mail", "mdx", "rmd", "rnoweb", "rst", "tex", "latex", "text", "typst", "xhtml", "md"},
+        })
 	end
     }
 }

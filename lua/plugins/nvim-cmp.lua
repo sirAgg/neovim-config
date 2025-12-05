@@ -7,6 +7,7 @@ return {
             {'hrsh7th/cmp-path'},
             {'hrsh7th/cmp-cmdline'},
             {'dcampos/cmp-snippy'},
+            {'hrsh7th/cmp-nvim-lsp-signature-help'},
         },
         config = function()
             local cmp = require'cmp'
@@ -45,6 +46,7 @@ return {
               -- { name = 'luasnip' }, -- For luasnip users.
               -- { name = 'ultisnips' }, -- For ultisnips users.
               { name = 'snippy' }, -- For snippy users.
+              { name = 'nvim_lsp_signature_help' }
             }, {
               { name = 'buffer' },
             })
