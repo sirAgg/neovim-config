@@ -3,8 +3,9 @@ vim.g.maplocalleader = "\\"
 
 vim.opt.clipboard = 'unnamedplus'
 vim.opt.shiftwidth = 4
+vim.cmd('set sts=4')
 vim.opt.tabstop = 4
-vim.opt.expandtab = true
+vim.opt.expandtab = false
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
@@ -16,10 +17,20 @@ vim.opt.hidden = true
 vim.opt.number = true
 vim.opt.relativenumber = true
 
+vim.opt.list = true
+vim.cmd('set lcs+=space:.')
+
 vim.opt.foldmethod = 'expr'
 vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
 vim.opt.foldtext = ''
 vim.opt.foldlevelstart = 99
+
+vim.diagnostic.config({
+    virtual_lines = false,
+    virtual_text = true,
+    underline = true,
+    floats = {focusable = true},
+})
 
 vim.cmd('set path+=**')
 vim.cmd('set nocompatible')
@@ -90,6 +101,24 @@ vim.api.nvim_create_autocmd({'VimEnter', 'DirChanged'}, {
 		else
 			vim.keymap.set('n', '<leader>e', telescope_builtin.find_files, { desc = 'Telescope find files' })
 		end
+    end
+})
+
+vim.api.nvim_create_autocmd({'BufNewFile', 'BufReadPost'}, {
+    pattern = {"*.rbxmx", "*.rbxlx"},
+    desc = 'RBXMX is XML!!!',
+    command = 'set filetype=xml',
+})
+
+local current_hover_win = nil
+vim.api.nvim_create_autocmd({'CursorHold'}, {
+    desc = 'hover',
+    callback = function()
+		if current_hover_win and vim.api.nvim_win_is_valid(current_hover_win) then
+			vim.api.nvim_win_close(current_hover_win, true)
+		end
+        local _, winnr = vim.diagnostic.open_float({border = {"╭", "─", "╮", "│", "╯", "─", "╰", "│"}, focusable = true})
+		current_hover_win = winnr
     end
 })
 
@@ -169,8 +198,8 @@ end
 vim.keymap.set('n', '<leader>Z', RunSelene)
 
 vim.o.updatetime = 250
-vim.cmd [[autocmd CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
-vim.cmd [[autocmd CursorHold * lua vim.diagnostic.open_float(nil, {focus=false})]]
+--vim.cmd [[autocmd CursorHoldI * lua vim.diagnostic.open_float(nil, {focus=false})]]
+--vim.cmd [[autocmd CursorHold * lua vim.diagnostic.open_float(nil, {focus=false})]]
 
 if vim.g.neovide then
     vim.o.guifont = "JetBrainsMono NFM:h14"
