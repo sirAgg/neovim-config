@@ -27,15 +27,29 @@ vim.opt.foldlevelstart = 99
 
 vim.diagnostic.config({
     virtual_lines = false,
-    virtual_text = true,
+    virtual_text = {
+		prefix = function (diagnostic, i, total)
+			if diagnostic.severity == vim.diagnostic.severity.ERROR then
+				return ''
+			elseif diagnostic.severity == vim.diagnostic.severity.WARN then
+				return ''
+			elseif diagnostic.severity == vim.diagnostic.severity.HINT then
+				return ''
+			elseif diagnostic.severity == vim.diagnostic.severity.INFO then
+				return ''
+			end
+		end
+	},
     underline = true,
-    floats = {focusable = true},
+    floats = {focusable = false},
 })
 
 vim.cmd('set path+=**')
 vim.cmd('set nocompatible')
 vim.cmd('set wildmode=longest,list,full')
 vim.cmd('set wildmenu')
+
+vim.cmd.colorscheme('elflord')
 
 
 require'config.lazy'
@@ -110,17 +124,17 @@ vim.api.nvim_create_autocmd({'BufNewFile', 'BufReadPost'}, {
     command = 'set filetype=xml',
 })
 
-local current_hover_win = nil
-vim.api.nvim_create_autocmd({'CursorHold'}, {
-    desc = 'hover',
-    callback = function()
-		if current_hover_win and vim.api.nvim_win_is_valid(current_hover_win) then
-			vim.api.nvim_win_close(current_hover_win, true)
-		end
-        local _, winnr = vim.diagnostic.open_float({border = {"╭", "─", "╮", "│", "╯", "─", "╰", "│"}, focusable = true})
-		current_hover_win = winnr
-    end
-})
+--local current_hover_win = nil
+--vim.api.nvim_create_autocmd({'CursorHold'}, {
+--    desc = 'hover',
+--    callback = function()
+--		if current_hover_win and vim.api.nvim_win_is_valid(current_hover_win) then
+--			vim.api.nvim_win_close(current_hover_win, true)
+--		end
+--        local _, winnr = vim.diagnostic.open_float({border = {"╭", "─", "╮", "│", "╯", "─", "╰", "│"}, focusable = true})
+--		current_hover_win = winnr
+--    end
+--})
 
 vim.keymap.set('n', '<leader>r', telescope_builtin.buffers, { desc = 'Telescope buffers' })
 vim.keymap.set('n', '<leader>t', telescope_builtin.lsp_dynamic_workspace_symbols, { desc = 'Lsp symbols' })
@@ -128,9 +142,10 @@ vim.keymap.set('n', '<leader>y', telescope_builtin.live_grep, { desc = 'Telescop
 vim.keymap.set('n', '<leader>u', '<cmd>TodoTelescope<cr>', { desc = 'Telescope Todo' })
 vim.keymap.set('n', '<leader>p', require'telescope'.extensions.projects.projects, { desc = 'Projects' })
 
-vim.keymap.set('n', '<leader>g', function() require'neogit'.open({kind = 'floating'}) end, { desc = 'Git' })
+vim.keymap.set('n', '<leader>g', function() require'neogit'.open({kind = 'split'}) end, { desc = 'Git' })
 
-vim.keymap.set('n', '<leader>o', function() require'oil'.toggle_float() end, { desc = 'Oil' })
+vim.keymap.set('n', '<leader>o', function() require'oil'.open() end, { desc = 'Oil' })
+
 
 local harpoon = require'harpoon'
 vim.keymap.set('n', '<leader>w', function() harpoon:list():add() end, {desc = 'Harpoon add'})
@@ -149,6 +164,17 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 	end,
     }
 )
+
+--vim.api.nvim_create_autocmd('DirChanged', {
+--	desc = 'Color per project.',
+--	callback = function()
+--		local cwd = vim.fn.getcwd()
+--		local rest, dir = cwd:match("(.*/)(.*)")
+--		print(rest)
+--		print(dir)
+--	end,
+--})
+
 
 function RunSelene()
     if vim.fn.filereadable('selene.toml') == 1 then

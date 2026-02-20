@@ -6,7 +6,7 @@ return {
 		config = function ()
 			require'telescope'.setup{
 				defaults = {
-					file_ignore_patterns = { ".ccls-cache/%", ".zig-cache/%", ".git/%", ".zig-out/%", ".cache/*", ".git/*" },
+					file_ignore_patterns = { ".ccls-cache/%", ".zig-cache/%", ".git/%", ".zig-out/%", ".cache/*", ".git/*"},
 				},
 			}
 		end,
