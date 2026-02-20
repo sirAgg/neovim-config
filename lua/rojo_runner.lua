@@ -86,7 +86,7 @@ local function rojo_sourcemap(project_file)
         return
     end
 
-    local command = {"rojo", "sourcemap", "--watch", project_file, "--output", "sourcemap.json", "--include-non-scripts"}
+    local command = {"rojo", "sourcemap", "--absolute", "--watch", project_file, "--output", "sourcemap.json", "--include-non-scripts"}
     rojo_sourcemap_process = vim.system(command, {text = true}, function(_)
         rojo_sourcemap_process = nil
         vim.schedule(function() rojo_log_write("[Rojo sourcemap stopped]") end);
