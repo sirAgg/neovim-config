@@ -26,9 +26,9 @@ vim.opt.foldtext = ''
 vim.opt.foldlevelstart = 99
 
 vim.diagnostic.config({
-    virtual_lines = false,
-    virtual_text = {
-		prefix = function (diagnostic, i, total)
+	virtual_lines = false,
+	virtual_text = {
+		prefix = function (diagnostic, _, _)
 			if diagnostic.severity == vim.diagnostic.severity.ERROR then
 				return ''
 			elseif diagnostic.severity == vim.diagnostic.severity.WARN then
@@ -37,11 +37,13 @@ vim.diagnostic.config({
 				return ''
 			elseif diagnostic.severity == vim.diagnostic.severity.INFO then
 				return ''
+			else
+				return ''
 			end
 		end
 	},
-    underline = true,
-    floats = {focusable = false},
+	underline = true,
+	floats = {focusable = false},
 })
 
 vim.cmd('set path+=**')
@@ -94,7 +96,7 @@ vim.keymap.set('n', 'gp', '<cmd>cprev<cr>')
 vim.keymap.set('t', '<esc>', '<C-\\><C-n>')
 
 if vim.fn.has('win32') or vim.fn.has('win64') then
-    vim.keymap.set('n', '<F9>', '<cmd>!explorer .<cr><cr>')
+	vim.keymap.set('n', '<F9>', '<cmd>!explorer .<cr><cr>')
 end
 
 vim.keymap.set('n', 'grn', vim.lsp.buf.rename)
@@ -107,33 +109,33 @@ require('telescope').load_extension('projects')
 local telescope_builtin = require('telescope.builtin')
 
 vim.api.nvim_create_autocmd({'VimEnter', 'DirChanged'}, {
-    desc = 'Loads project specific build commands',
-    group = vim.api.nvim_create_augroup('file-finder-decider-group', {clear = true}),
-    callback = function()
+	desc = 'Loads project specific build commands',
+	group = vim.api.nvim_create_augroup('file-finder-decider-group', {clear = true}),
+	callback = function()
 		if vim.fn.isdirectory('.git') == 1 then
 			vim.keymap.set('n', '<leader>e', telescope_builtin.git_files, { desc = 'Telescope find files' })
 		else
 			vim.keymap.set('n', '<leader>e', telescope_builtin.find_files, { desc = 'Telescope find files' })
 		end
-    end
+	end
 })
 
 vim.api.nvim_create_autocmd({'BufNewFile', 'BufReadPost'}, {
-    pattern = {"*.rbxmx", "*.rbxlx"},
-    desc = 'RBXMX is XML!!!',
-    command = 'set filetype=xml',
+	pattern = {"*.rbxmx", "*.rbxlx"},
+	desc = 'RBXMX is XML!!!',
+	command = 'set filetype=xml',
 })
 
 --local current_hover_win = nil
 --vim.api.nvim_create_autocmd({'CursorHold'}, {
---    desc = 'hover',
---    callback = function()
+--	  desc = 'hover',
+--	  callback = function()
 --		if current_hover_win and vim.api.nvim_win_is_valid(current_hover_win) then
 --			vim.api.nvim_win_close(current_hover_win, true)
 --		end
---        local _, winnr = vim.diagnostic.open_float({border = {"╭", "─", "╮", "│", "╯", "─", "╰", "│"}, focusable = true})
+--		  local _, winnr = vim.diagnostic.open_float({border = {"╭", "─", "╮", "│", "╯", "─", "╰", "│"}, focusable = true})
 --		current_hover_win = winnr
---    end
+--	  end
 --})
 
 vim.keymap.set('n', '<leader>r', telescope_builtin.buffers, { desc = 'Telescope buffers' })
@@ -160,9 +162,9 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 	desc = 'Highlight when yanking text',
 	group = vim.api.nvim_create_augroup('kickstart-highlight-group', {clear = true} ),
 	callback = function()
-	    vim.highlight.on_yank()
+		vim.highlight.on_yank()
 	end,
-    }
+	}
 )
 
 --vim.api.nvim_create_autocmd('DirChanged', {
@@ -177,48 +179,48 @@ vim.api.nvim_create_autocmd('TextYankPost', {
 
 
 function RunSelene()
-    if vim.fn.filereadable('selene.toml') == 1 then
-        vim.schedule(function()
-            local lines = vim.fn.systemlist('selene . -q')
-            local list = {}
+	if vim.fn.filereadable('selene.toml') == 1 then
+		vim.schedule(function()
+			local lines = vim.fn.systemlist('selene . -q')
+			local list = {}
 
-            local msgs = 0
+			local msgs = 0
 
-            for _, line in ipairs(lines) do
-                local file_end = line:find(':')
-                if not file_end then
-                    table.insert(list, {text = line, valid = false})
-                    goto continue
-                end
-                local file = line:sub(0, file_end-1) -- -1 to skip colon
+			for _, line in ipairs(lines) do
+				local file_end = line:find(':')
+				if not file_end then
+					table.insert(list, {text = line, valid = false})
+					goto continue
+				end
+				local file = line:sub(0, file_end-1) -- -1 to skip colon
 
-                local line_num, col_num = string.match(line,':(%d*):(%d*):', file_end)
+				local line_num, col_num = string.match(line,':(%d*):(%d*):', file_end)
 
-                --local _, num_end = string.find(line,':(%d*):(%d*):', file_end)
+				--local _, num_end = string.find(line,':(%d*):(%d*):', file_end)
 
-                local type = 'W'
-                if line:find('warning%[.*%]', file_end) then
-                    type = 'W'
-                elseif line:find('error%[.*%]', file_end) then
-                    type = 'E'
-                else
-                    table.insert(list, {text = line, valid = false})
-                    goto continue
-                end
+				local type = 'W'
+				if line:find('warning%[.*%]', file_end) then
+					type = 'W'
+				elseif line:find('error%[.*%]', file_end) then
+					type = 'E'
+				else
+					table.insert(list, {text = line, valid = false})
+					goto continue
+				end
 
-                local text = line:match('.*(%[.*)$', file_end)
+				local text = line:match('.*(%[.*)$', file_end)
 
-                table.insert(list, {filename = file, lnum = line_num, col = col_num, type = type, text = text})
-                msgs = msgs+1
-                ::continue::
-            end
-            if msgs <= 0 then
-                print("no selene errors")
-            end
-            vim.fn.setqflist(list)
-            vim.cmd('cw')
-        end)
-    end
+				table.insert(list, {filename = file, lnum = line_num, col = col_num, type = type, text = text})
+				msgs = msgs+1
+				::continue::
+			end
+			if msgs <= 0 then
+				print("no selene errors")
+			end
+			vim.fn.setqflist(list)
+			vim.cmd('cw')
+		end)
+	end
 end
 
 vim.keymap.set('n', '<leader>Z', RunSelene)
@@ -229,9 +231,9 @@ vim.o.updatetime = 250
 
 if vim.g.neovide then
 	vim.o.guifont = "JetBrainsMono NFM:h14"
-    vim.g.neovide_hide_mouse_when_typing = true
+	vim.g.neovide_hide_mouse_when_typing = true
 
-    vim.keymap.set('n', '<leader><', function() vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.05 end, { desc = 'Change text size.' })
-    vim.keymap.set('n', '<leader>>', function() vim.g.neovide_scale_factor = vim.g.neovide_scale_factor + 0.05 end, { desc = 'Change text size.' })
-    vim.keymap.set('n', '<F11>', function() vim.g.neovide_fullscreen = not vim.g.neovide_fullscreen end, { desc = 'Toggle fullscreen.'})
+	vim.keymap.set('n', '<leader><', function() vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.05 end, { desc = 'Change text size.' })
+	vim.keymap.set('n', '<leader>>', function() vim.g.neovide_scale_factor = vim.g.neovide_scale_factor + 0.05 end, { desc = 'Change text size.' })
+	vim.keymap.set('n', '<F11>', function() vim.g.neovide_fullscreen = not vim.g.neovide_fullscreen end, { desc = 'Toggle fullscreen.'})
 end

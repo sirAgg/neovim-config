@@ -23,11 +23,18 @@ return {
 		})
 
 		vim.lsp.config('lua_ls', {
-			capabilities = capabilities
+			capabilities = capabilities,
+			settings = {
+				lua = {
+					diagnostics = {
+						globals = {"vim"}
+					}
+				}
+			}
 		})
 		vim.lsp.config('luau_lsp', {
 			capabilities = capabilities,
-			cmd = {"luau-lsp", "lsp", "--definitions=C:\\Users\\Magnus\\Downloads\\globalTypes.d.luau"}, --, "--flag:LuauSolverV2=true"
+			cmd = {"luau-lsp", "lsp", "--definitions=" .. vim.api.nvim_get_runtime_file('roblox/globalTypes.d.luau', false)[1]}, --, "--flag:LuauSolverV2=true"
 		})
 		vim.lsp.config('jsonls', {
 			capabilities = capabilities
