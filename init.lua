@@ -230,7 +230,7 @@ vim.o.updatetime = 250
 --vim.cmd [[autocmd CursorHold * lua vim.diagnostic.open_float(nil, {focus=false})]]
 
 if vim.g.neovide then
-	vim.o.guifont = "JetBrainsMono NFM:h14"
+	vim.o.guifont = "JetBrainsMono NFM:h10"
 	vim.g.neovide_hide_mouse_when_typing = true
 
 	vim.keymap.set('n', '<leader><', function() vim.g.neovide_scale_factor = vim.g.neovide_scale_factor - 0.05 end, { desc = 'Change text size.' })
