@@ -2,9 +2,9 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
 vim.opt.clipboard = 'unnamedplus'
-vim.opt.shiftwidth = 4
-vim.cmd('set sts=4')
-vim.opt.tabstop = 4
+vim.opt.shiftwidth = 8
+vim.cmd('set sts=8')
+vim.opt.tabstop = 8
 vim.opt.expandtab = false
 
 vim.opt.splitbelow = true
@@ -124,6 +124,18 @@ vim.api.nvim_create_autocmd({'BufNewFile', 'BufReadPost'}, {
 	pattern = {"*.rbxmx", "*.rbxlx"},
 	desc = 'RBXMX is XML!!!',
 	command = 'set filetype=xml',
+})
+
+vim.api.nvim_create_autocmd("BufWritePre", {
+	pattern = "*.go",
+	callback = function()
+		vim.lsp.buf.format({
+		async = false,
+		filter = function(client)
+			return client.name == "gopls"
+		end,
+		})
+	end,
 })
 
 --local current_hover_win = nil

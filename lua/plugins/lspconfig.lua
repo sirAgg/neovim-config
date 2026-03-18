@@ -21,6 +21,10 @@ return {
 		vim.lsp.config('clangd', {
 			capabilities = capabilities
 		})
+		
+		vim.lsp.config('gopls', {
+			capabilities = capabilities
+		})
 
 		vim.lsp.config('lua_ls', {
 			capabilities = capabilities,
@@ -48,7 +52,7 @@ return {
 			enabled = { "bib", "context", "gitcommit", "html", "markdown", "org", "pandoc", "plaintex", "quarto", "mail", "mdx", "rmd", "rnoweb", "rst", "tex", "latex", "text", "typst", "xhtml", "md"},
 		})
 
-		vim.lsp.enable({'clangd', 'luau_lsp', 'lua_ls', 'jsonls'})
+		vim.lsp.enable({'clangd', 'gopls', 'luau_lsp', 'lua_ls', 'jsonls'})
 	end
 	}
 }
