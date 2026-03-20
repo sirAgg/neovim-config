@@ -2,9 +2,9 @@ vim.g.mapleader = " "
 vim.g.maplocalleader = "\\"
 
 vim.opt.clipboard = 'unnamedplus'
-vim.opt.shiftwidth = 4
-vim.cmd('set sts=4')
-vim.opt.tabstop = 4
+vim.opt.shiftwidth = 8
+vim.cmd('set sts=8')
+vim.opt.tabstop = 8
 vim.opt.expandtab = false
 
 vim.opt.splitbelow = true
@@ -64,9 +64,9 @@ local rem = require'remedybg'
 
 rem.setup{}
 
-vim.keymap.set("n", '<space><space>x', '<cmd>source%<cr>')
-vim.keymap.set("n", '<space>x', ':.lua<cr>')
-vim.keymap.set("v", '<space>x', ':lua<cr>')
+--vim.keymap.set("n", '<space><space>x', '<cmd>source%<cr>')
+--vim.keymap.set("n", '<space>x', ':.lua<cr>')
+--vim.keymap.set("v", '<space>x', ':lua<cr>')
 
 vim.keymap.set("n", '<space>b', rem.start_debugging)
 vim.keymap.set("n", '<space>f', rem.set_breakpoint_at_cursor)
@@ -104,6 +104,7 @@ vim.keymap.set('n', 'gra', vim.lsp.buf.code_action)
 vim.keymap.set('n', 'grr', vim.lsp.buf.references)
 vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help)
 vim.keymap.set('n', '<leader>m', '<cmd>ClangdSwitchSourceHeader<cr>')
+vim.keymap.set('n', '<leader>i', vim.diagnostic.open_float)
 
 require('telescope').load_extension('projects')
 local telescope_builtin = require('telescope.builtin')
