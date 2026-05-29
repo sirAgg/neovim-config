@@ -41,7 +41,7 @@ return {
               ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
             }),
             sources = cmp.config.sources({
-              { name = 'nvim_lsp' },
+              --{ name = 'nvim_lsp' },
               -- { name = 'vsnip' }, -- For vsnip users.
               -- { name = 'luasnip' }, -- For luasnip users.
               -- { name = 'ultisnips' }, -- For ultisnips users.
@@ -49,7 +49,20 @@ return {
               { name = 'nvim_lsp_signature_help' }
             }, {
               { name = 'buffer' },
-            })
+            }),
+            sorting = {
+                comparators = {
+                    cmp.config.compare.offset,
+                    cmp.config.compare.exact,
+                    cmp.config.compare.recently_used,
+                    require("clangd_extensions.cmp_scores"),
+                    cmp.config.compare.kind,
+                    cmp.config.compare.sort_text,
+                    cmp.config.compare.length,
+                    cmp.config.compare.order,
+                },
+		priority_weight = 2,
+            },
             }
 
         end
