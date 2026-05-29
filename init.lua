@@ -10,7 +10,8 @@ vim.opt.expandtab = false
 vim.opt.splitbelow = true
 vim.opt.splitright = true
 
-vim.opt.scl = 'no'
+
+vim.opt.scl = 'yes'
 vim.opt.cursorline = true
 vim.opt.mouse = 'a'
 vim.opt.hidden = true

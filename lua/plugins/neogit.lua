@@ -18,7 +18,7 @@ return {
 		  -- Disables changing the buffer highlights based on where the cursor is.
 		  disable_context_highlighting = false,
 		  -- Disables signs for sections/items/hunks
-		  disable_signs = false,
+		  disable_signs = true,
 		  -- Path to git executable. Defaults to "git". Can be used to specify a custom git binary or wrapper script.
 		  git_executable = "git",
 		  -- Offer to force push when branches diverge
