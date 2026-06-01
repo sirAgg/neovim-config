@@ -22,7 +22,7 @@ vim.opt.list = true
 vim.cmd('set lcs+=space:.')
 
 vim.opt.foldmethod = 'expr'
-vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
 vim.opt.foldtext = ''
 vim.opt.foldlevelstart = 99
 
@@ -104,8 +104,11 @@ vim.keymap.set('n', 'grn', vim.lsp.buf.rename)
 vim.keymap.set('n', 'gra', vim.lsp.buf.code_action)
 vim.keymap.set('n', 'grr', vim.lsp.buf.references)
 vim.keymap.set('i', '<C-s>', vim.lsp.buf.signature_help)
-vim.keymap.set('n', '<leader>m', '<cmd>ClangdSwitchSourceHeader<cr>')
 vim.keymap.set('n', '<leader>i', vim.diagnostic.open_float)
+vim.keymap.set('n', '<leader>m', '<cmd>ClangdSwitchSourceHeader<cr>')
+
+vim.keymap.set("n", "<leader>/", "gcc", { remap = true })
+vim.keymap.set("v", "<leader>/", "gc", { remap = true })
 
 require('telescope').load_extension('projects')
 local telescope_builtin = require('telescope.builtin')
