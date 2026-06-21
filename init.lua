@@ -11,7 +11,7 @@ vim.opt.splitbelow = true
 vim.opt.splitright = true
 
 
-vim.opt.scl = 'yes'
+vim.opt.scl = 'no'
 vim.opt.cursorline = true
 vim.opt.mouse = 'a'
 vim.opt.hidden = true
